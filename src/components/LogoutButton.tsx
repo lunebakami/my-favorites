@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabase';
+import { Button } from './ui/button';
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -11,6 +12,6 @@ export default function LogoutButton() {
     router.push('/login');
   };
 
-  return <button onClick={handleLogout}>Logout</button>;
+  return <Button variant="outline" onClick={handleLogout}>Logout</Button>;
 }
 

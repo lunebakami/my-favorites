@@ -1,37 +1,42 @@
+"use client";
+
 import {
   NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import Link from "next/link";
+import LogoutButton from "./LogoutButton";
 
 export default function Navbar() {
   return (
-    <NavigationMenu>
-      <NavigationMenuTrigger>
-        <NavigationMenuIndicator />
-      </NavigationMenuTrigger>
+    <NavigationMenu className="max-w-full w-full flex justify-between">
+      <NavigationMenuList className="w-100">
+        <NavigationMenuItem>
+          <Link href="/docs" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Home
+            </NavigationMenuLink>
+          </Link>{" "}
+        </NavigationMenuItem>
 
-      <NavigationMenuContent>
-        <NavigationMenuList>
+        <NavigationMenuItem>
+          <Link href="/docs" legacyBehavior passHref>
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              My Favorites
+            </NavigationMenuLink>
+          </Link>{" "}
+        </NavigationMenuItem>
+      </NavigationMenuList>
 
-          <NavigationMenuItem>
-            <NavigationMenuLink href="/dashboard">Dashboard</NavigationMenuLink>
-          </NavigationMenuItem>
-          
-          <NavigationMenuItem>
-            <NavigationMenuLink href="/login">Login</NavigationMenuLink>
-          </NavigationMenuItem>
-
-          <NavigationMenuItem>
-            <NavigationMenuLink href="/register">Register</NavigationMenuLink>
-          </NavigationMenuItem>
-
-        </NavigationMenuList>
-      </NavigationMenuContent>
+      
+      <NavigationMenuList>
+        <NavigationMenuItem className="mt-2 mr-4">
+          <LogoutButton />
+        </NavigationMenuItem>
+      </NavigationMenuList>
     </NavigationMenu>
   );
 }
