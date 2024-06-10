@@ -9,6 +9,7 @@ import CarouselList from "@/components/CarouselList";
 import { supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export type Character = {
   _id: number;
@@ -98,7 +99,11 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-center my-8">
               Some Disney Characteres
             </h1>
-            <Button>See All</Button>
+            <Button>
+                <Link href="/disney">
+                  See All
+                </Link>
+              </Button>
           </div>
           <div className="w-full">
             <CarouselList
