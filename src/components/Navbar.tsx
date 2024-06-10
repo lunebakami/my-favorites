@@ -15,7 +15,7 @@ export default function Navbar() {
     <NavigationMenu className="max-w-full w-full flex justify-between">
       <NavigationMenuList className="w-100">
         <NavigationMenuItem>
-          <Link href="/docs" legacyBehavior passHref>
+          <Link href="/dashboard" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               Home
             </NavigationMenuLink>
@@ -23,7 +23,7 @@ export default function Navbar() {
         </NavigationMenuItem>
 
         <NavigationMenuItem>
-          <Link href="/docs" legacyBehavior passHref>
+          <Link href="/my-favorites" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               My Favorites
             </NavigationMenuLink>
