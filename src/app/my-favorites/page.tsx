@@ -6,6 +6,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Navbar from "@/components/Navbar";
 import CarouselList from "@/components/CarouselList";
 import { Character } from "../dashboard/page";
+import { useToast } from "@/components/ui/use-toast";
 
 type SupabaseFavorite = {
   character_id: number;
@@ -16,14 +17,20 @@ type SupabaseFavorite = {
 export default function MyFavorites() {
   const [favorites, setFavorites] = useState<SupabaseFavorite[]>([]);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchFavorites = async () => {
       const { data } = await supabase.from("favorite_character").select("*");
 
-      console.log({ data });
+      if (data) {
+        toast({
+          title: "Success",
+          description: "Favorite removed",
+        });
+        setFavorites(data || []);
+      }
 
-      setFavorites(data || []);
       setLoading(false);
     };
 
@@ -31,14 +38,26 @@ export default function MyFavorites() {
   }, []);
 
   const removeFavorite = async (character: Partial<Character>) => {
-    const user_id = await supabase.auth.getSession();
+    const { data } = await supabase.auth.getSession();
 
-    await supabase
+    const { error } = await supabase
       .from("favorite_character")
       .delete()
       .eq("character_id", character._id)
-      .eq("user_id", user_id);
+      .eq("user_id", data.session?.user?.id);
 
+    if (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred while removing the favorite character",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Favorite removed",
+    });
     setFavorites((prev) =>
       prev.filter((favorite) => favorite.character_id !== character._id),
     );
