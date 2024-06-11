@@ -6,40 +6,16 @@ import { useEffect, useState } from "react";
 import { disneyApi } from "@/lib/api";
 import getRandomItems from "./getRandomItems";
 import CarouselList from "@/components/CarouselList";
-import { supabase } from "@/lib/supabase";
-import { useToast } from "@/components/ui/use-toast";
+import { addFavorite } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-export type Character = {
-  _id: number;
-  films: string[];
-  shortFilms: string[];
-  tvShows: string[];
-  videoGames: string[];
-  parkAttractions: string[];
-  allies: string[];
-  enemies: string[];
-  sourceUrl: string;
-  name: string;
-  imageUrl: string;
-  createdAt: string;
-  updatedAt: string;
-  url: string;
-  __v: number;
-};
-
-type FormattedCharacter = {
-  _id: number;
-  title: string;
-  description: string;
-  imageUrl: string;
-};
+import { Character, FormattedCharacter } from "./types";
+import { useToast } from "@/components/ui/use-toast";
+import debounce from "@/lib/debounce";
 
 export default function Dashboard() {
   const [characters, setCharacters] = useState<FormattedCharacter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
   const { toast } = useToast();
 
   useEffect(() => {
@@ -66,12 +42,8 @@ export default function Dashboard() {
     fetchCharacters();
   }, []);
 
-  const addFavorite = async (character: Partial<Character>) => {
-    const { data, error } = await supabase.from("favorite_character").insert({
-      character_id: character._id,
-      name: character.name,
-      image_url: character.imageUrl,
-    });
+  const handleAddFavorite = async (character: Partial<Character>) => {
+    const { error } = await addFavorite(character);
 
     if (error) {
       toast({
@@ -87,6 +59,8 @@ export default function Dashboard() {
     });
   };
 
+  const debounceAddFavorite = debounce(handleAddFavorite, 1000);
+
   return (
     <ProtectedRoute>
       <Navbar />
@@ -99,16 +73,14 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-center my-8">
               Some Disney Characteres
             </h1>
-            <Button>
-                <Link href="/disney">
-                  See All
-                </Link>
-              </Button>
+            <Link href="/disney">
+              <Button>See All</Button>
+            </Link>
           </div>
           <div className="w-full">
             <CarouselList
               items={characters}
-              handleClick={(character) => addFavorite(character)}
+              handleClick={(character) => debounceAddFavorite(character)}
             />
           </div>
         </>

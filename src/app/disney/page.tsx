@@ -5,7 +5,7 @@ import Navbar from "../../components/Navbar";
 import { useEffect, useState } from "react";
 import { disneyApi } from "@/lib/api";
 
-import { supabase } from "@/lib/supabase";
+import { addFavorite, supabase } from "@/lib/supabase";
 import { useToast } from "@/components/ui/use-toast";
 import { Grid } from "./styles";
 import CardWithImage from "@/components/CardWithImage";
@@ -20,6 +20,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import debounce from "@/lib/debounce";
 
 export type Character = {
   _id: number;
@@ -41,7 +42,7 @@ export type Character = {
 
 type FormattedCharacter = {
   _id: number;
-  title: string;
+  name: string;
   description: string;
   imageUrl: string;
 };
@@ -71,7 +72,7 @@ export default function Disney() {
 
       const formattedCharacteres = data.data.map((character: Character) => ({
         _id: character._id,
-        title: character.name,
+        name: character.name,
         description: character.films[0],
         imageUrl: character.imageUrl,
       }));
@@ -84,12 +85,8 @@ export default function Disney() {
     fetchCharacters();
   }, []);
 
-  const addFavorite = async (character: Partial<Character>) => {
-    const { error } = await supabase.from("favorite_character").insert({
-      character_id: character._id,
-      name: character.name,
-      image_url: character.imageUrl,
-    });
+  const handleAddFavorite = async (character: Partial<Character>) => {
+    const { error } = await addFavorite(character);
 
     if (error) {
       toast({
@@ -104,6 +101,8 @@ export default function Disney() {
       description: "Favorite character added",
     });
   };
+
+  const debounceAddFavorite = debounce(handleAddFavorite, 1000);
 
   return (
     <ProtectedRoute>
@@ -122,10 +121,10 @@ export default function Disney() {
               {characters.map((character) => (
                 <CardWithImage
                   key={character._id}
-                  title={character.title}
+                  title={character.name}
                   description={character.description}
                   image={character.imageUrl}
-                  clickHandler={() => addFavorite(character)}
+                  clickHandler={() => debounceAddFavorite(character)}
                 />
               ))}
             </Grid>

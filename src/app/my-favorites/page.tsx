@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { removeFavorite, supabase } from "@/lib/supabase";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Navbar from "@/components/Navbar";
 import CarouselList from "@/components/CarouselList";
-import { Character } from "../dashboard/page";
 import { useToast } from "@/components/ui/use-toast";
+import debounce from "@/lib/debounce";
+import { Character } from "../dashboard/types";
 
 type SupabaseFavorite = {
   character_id: number;
@@ -37,14 +38,8 @@ export default function MyFavorites() {
     fetchFavorites();
   }, []);
 
-  const removeFavorite = async (character: Partial<Character>) => {
-    const { data } = await supabase.auth.getSession();
-
-    const { error } = await supabase
-      .from("favorite_character")
-      .delete()
-      .eq("character_id", character._id)
-      .eq("user_id", data.session?.user?.id);
+  const handleRemoveFavorite = async (character: Character) => {
+    const { error } = await removeFavorite(character);
 
     if (error) {
       toast({
@@ -63,6 +58,8 @@ export default function MyFavorites() {
     );
   };
 
+  const debounceRemoveFavorite = debounce(handleRemoveFavorite, 1000);
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -77,7 +74,7 @@ export default function MyFavorites() {
         ) : (
           <CarouselList
             buttonText="Remove"
-            handleClick={(character) => removeFavorite(character)}
+            handleClick={(character) => debounceRemoveFavorite(character)}
             items={favorites.map((favorite) => ({
               _id: favorite.character_id,
               title: favorite.name,
