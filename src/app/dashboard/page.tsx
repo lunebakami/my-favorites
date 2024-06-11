@@ -48,7 +48,7 @@ export default function Dashboard() {
     if (error) {
       toast({
         title: "Error",
-        description: "An error occurred while adding the favorite character",
+        description: error.message ?? "An error occurred while adding the favorite character",
       });
       return;
     }

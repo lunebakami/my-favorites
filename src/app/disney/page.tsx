@@ -21,6 +21,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import debounce from "@/lib/debounce";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export type Character = {
   _id: number;
@@ -51,6 +53,8 @@ export default function Disney() {
   const [characters, setCharacters] = useState<FormattedCharacter[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  const [search, setSearch] = useState("");
+
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page")) || 1;
   const pageSize = searchParams.get("pageSize") || 25;
@@ -91,7 +95,9 @@ export default function Disney() {
     if (error) {
       toast({
         title: "Error",
-        description: "An error occurred while adding the favorite character",
+        description:
+          error.message ??
+          "An error occurred while adding the favorite character",
       });
       return;
     }
@@ -104,6 +110,15 @@ export default function Disney() {
 
   const debounceAddFavorite = debounce(handleAddFavorite, 1000);
 
+  const handleSearch = async () => {
+    const { data } = await disneyApi.get(
+      `/character?name=${search}`,
+    );
+
+    setCharacters(data.data);
+    setTotalCount(1);
+  };
+
   return (
     <ProtectedRoute>
       <Navbar />
@@ -111,10 +126,19 @@ export default function Disney() {
         <div>Loading...</div>
       ) : (
         <>
-          <div className="flex justify-center items-center gap-10">
-            <h1 className="text-3xl font-bold text-center my-8">
+          <div className="flex flex-col justify-center items-center">
+            <h1 className="text-3xl font-bold text-center mt-8 mb-4">
               All Disney Characteres
             </h1>
+            <div className="flex w-80 gap-2 mb-8">
+              <Input
+                type="text"
+                placeholder="Search Characteres By Name"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button className="w-16" onClick={() => handleSearch()}>Search</Button>
+            </div>
           </div>
           <div className="w-full">
             <Grid>
